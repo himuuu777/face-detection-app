@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FaceScan - Face Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
+    <div class="brand"><span class="logo">&#9673;</span>FaceScan</div>
+    <p class="tagline">Face detection software &middot; Python + OpenCV + Flask</p>
+  </header>
+
+  <main class="layout">
+
+    <!-- ===== LEFT: INPUT (webcam or photo) ===== -->
+    <section class="card">
+      <div class="tabs">
+        <button class="tab active" data-tab="webcam">Live Webcam</button>
+        <button class="tab" data-tab="upload">Upload Photo</button>
+      </div>
+
+      <!-- Webcam tab -->
+      <div class="tab-panel active" id="tab-webcam">
+        <div class="video-wrap" id="videoWrap">
+          <video id="video" autoplay playsinline muted></video>
+          <canvas id="overlay"></canvas>
+          <div class="video-placeholder" id="videoPlaceholder">Camera is off. Click "Start Camera".</div>
+        </div>
+        <div class="controls">
+          <button id="startBtn" class="btn primary">Start Camera</button>
+          <button id="snapBtn" class="btn" disabled>Save Snapshot</button>
+          <button id="stopBtn" class="btn ghost" disabled>Stop</button>
+        </div>
+      </div>
+
+      <!-- Upload tab -->
+      <div class="tab-panel" id="tab-upload">
+        <form id="uploadForm">
+          <label class="dropzone" id="dropzone">
+            <input type="file" id="photoInput" accept="image/*" hidden>
+            <span id="dropText">Click to choose a photo, or drag and drop it here</span>
+          </label>
+          <div class="controls">
+            <button type="submit" class="btn primary" id="detectBtn">Detect Faces</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Sensitivity slider (works for both tabs) -->
+      <div class="slider-row">
+        <label for="sensitivity">Sensitivity: <strong id="sensLabel">Medium</strong></label>
+        <input type="range" id="sensitivity" min="1" max="5" value="3">
+        <small>Higher finds more faces but may give false alarms.</small>
+      </div>
+    </section>
+
+    <!-- ===== RIGHT: RESULT ===== -->
+    <section class="card">
+      <h2>Result</h2>
+      <div class="count-box">
+        <span id="faceCount">0</span>
+        <span class="count-label">faces detected</span>
+      </div>
+      <div class="result-image-wrap">
+        <img id="resultImage" alt="Detection result" hidden>
+        <p id="resultHint" class="hint">Save a snapshot or upload a photo to see the marked result here.</p>
+      </div>
+      <p id="status" class="status info">Ready.</p>
+    </section>
+
+  </main>
+
+  <!-- ===== BOTTOM: DASHBOARD ===== -->
+  <section class="history-wrap">
+    <div class="card">
+      <div class="history-head">
+        <h2>Results Dashboard</h2>
+        <div class="history-actions">
+          <a class="btn" href="/api/export">Download CSV</a>
+          <button id="clearBtn" class="btn ghost danger">Clear all</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat"><span class="stat-value" id="statScans">0</span><span class="stat-label">Total scans</span></div>
+        <div class="stat"><span class="stat-value" id="statFaces">0</span><span class="stat-label">Faces found</span></div>
+        <div class="stat"><span class="stat-value" id="statAvg">0</span><span class="stat-label">Average per scan</span></div>
+        <div class="stat"><span class="stat-value small" id="statLast">-</span><span class="stat-label">Last scan</span></div>
+      </div>
+
+      <h3>Faces per scan (latest 12)</h3>
+      <div id="chart" class="chart"></div>
+
+      <h3>Scan history</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Date &amp; Time</th><th>Source</th><th>Faces</th><th>Picture</th></tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+        <p id="emptyHistory" class="hint">No scans yet. Save a snapshot or upload a photo to get started.</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
